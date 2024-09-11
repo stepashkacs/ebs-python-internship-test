@@ -1,11 +1,17 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
 from rest_framework.generics import GenericAPIView, get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from apps.blog.models import Blog, Category
-from apps.blog.serializers import BlogSerializer, CategorySerializer
+from apps.blog.models import Blog, Category, BlogPost, BlogComment
+from apps.blog.serializers import (
+    BlogSerializer,
+    CategorySerializer,
+    BlogPostSerializer,
+    BlogCommentSerializer,
+    CommentCreateSerializer
+)
 from apps.common.permissions import ReadOnly
 
 
@@ -30,3 +36,24 @@ class BlogItemView(GenericAPIView):
     def get(self, request: Request, pk: int) -> Response:
         blog: Blog = get_object_or_404(Blog.objects.all(), pk=pk)
         return Response(self.get_serializer(blog).data)
+
+
+class CreateBlogPostView(generics.CreateAPIView):
+    queryset = BlogPost.objects.all()
+    serializer_class = BlogPostSerializer
+
+
+class CreateBlogCommentView(generics.CreateAPIView):
+    queryset = BlogComment.objects.all()
+    serializer_class = BlogCommentSerializer
+
+
+class CreateCommentView(generics.CreateAPIView):
+    queryset = BlogComment.objects.all()
+    serializer_class = CommentCreateSerializer
+
+
+class BlogPostDetailView(generics.RetrieveAPIView):
+    queryset = BlogPost.objects.all()
+    serializer_class = BlogPostSerializer
+    lookup_field = 'id'
